@@ -1,0 +1,101 @@
+1
+CREATE FUNCTION GetMonthName (@Date DATE)
+RETURNS VARCHAR(20)
+AS
+BEGIN
+    RETURN DATENAME(MONTH, @Date)
+END
+#####################
+2
+#####################
+CREATE FUNCTION GetValuesBetween (@Start INT, @End INT)
+RETURNS @Results TABLE (Value INT)
+AS
+BEGIN
+    DECLARE @Counter INT = @Start + 1
+    WHILE @Counter < @End
+    BEGIN
+        INSERT INTO @Results VALUES (@Counter)
+        SET @Counter += 1
+    END
+    RETURN
+END
+#####################
+3
+#####################
+CREATE FUNCTION GetStudentDeptInfo (@St_Id INT)
+RETURNS TABLE
+AS
+RETURN (
+    SELECT 
+        ISNULL(S.St_Fname, '') + ' ' + ISNULL(S.St_Lname, '') AS [Full Name],
+        D.Dept_Name
+    FROM Student S 
+    JOIN Department D ON S.Dept_Id = D.Dept_Id
+    WHERE S.St_Id = @St_Id
+)
+#####################
+4
+#####################
+CREATE FUNCTION CheckStudentNames (@St_Id INT)
+RETURNS VARCHAR(50)
+AS
+BEGIN
+    DECLARE @Msg VARCHAR(50)
+    SELECT @Msg = 
+        CASE 
+            WHEN St_Fname IS NULL AND St_Lname IS NULL THEN 'First name & last name are null'
+            WHEN St_Fname IS NULL THEN 'first name is null'
+            WHEN St_Lname IS NULL THEN 'last name is null'
+            ELSE 'First name & last name are not null'
+        END
+    FROM Student
+    WHERE St_Id = @St_Id
+    RETURN @Msg
+END
+#####################
+5
+#####################
+CREATE FUNCTION GetMgrHireDateFormatted (@FormatID INT)
+RETURNS TABLE
+AS
+RETURN (
+    SELECT 
+        D.Dept_Name,
+        I.Ins_Name AS Manager_Name,
+        CONVERT(VARCHAR(50), D.Manager_hiredate, @FormatID) AS Formatted_Date
+    FROM Department D
+    LEFT JOIN Instructor I ON D.Dept_Manager = I.Ins_Id
+)
+#####################
+6
+#####################
+CREATE FUNCTION GetStudentNameByType (@Type VARCHAR(20))
+RETURNS @Result TABLE (StudentName VARCHAR(100))
+AS
+BEGIN
+    IF @Type = 'first name'
+        INSERT INTO @Result SELECT St_Fname FROM Student
+    ELSE IF @Type = 'last name'
+        INSERT INTO @Result SELECT St_Lname FROM Student
+    ELSE IF @Type = 'full name'
+        INSERT INTO @Result 
+        SELECT ISNULL(St_Fname, '') + ' ' + ISNULL(St_Lname, '') FROM Student
+    
+    RETURN
+END
+#####################
+MyCompany DB
+1-
+
+CREATE FUNCTION GetEmployeesByProject (@ProjectNo INT)
+RETURNS TABLE
+AS
+RETURN (
+    SELECT 
+        E.Fname + ' ' + E.Lname AS [Employee Name],
+        W.Hours AS [Hours Worked]
+    FROM Employee E
+    JOIN Works_for W ON E.SSN = W.ESSn
+    WHERE W.Pno = @ProjectNo
+)

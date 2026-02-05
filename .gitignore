@@ -1,0 +1,12 @@
+.git/
+
+*.zip
+*.rar
+
+*.swp
+*.tmp
+~$*
+
+.DS_Store
+Thumbs.db
+desktop.ini
