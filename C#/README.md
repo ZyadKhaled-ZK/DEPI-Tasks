@@ -1,2 +1,2 @@
-# C# & SQL Tasks - DEPI Program
+# C#  Tasks - DEPI Program
 
